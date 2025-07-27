@@ -6,17 +6,15 @@ import * as THREE from 'three';
 function Particles({ count = 100 }) {
   const mesh = useRef<THREE.Points>(null);
   
-  const particlesGeometry = useMemo(() => {
-    const positions = new Float32Array(count * 3);
+  // Create positions array
+  const positions = useMemo(() => {
+    const pos = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
+      pos[i * 3] = (Math.random() - 0.5) * 20;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 20;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 20;
     }
-    
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    return geometry;
+    return pos;
   }, [count]);
 
   useFrame((state) => {
@@ -27,8 +25,17 @@ function Particles({ count = 100 }) {
   });
 
   return (
-    <points ref={mesh} geometry={particlesGeometry}>
+    <points ref={mesh}>
+      <bufferGeometry attach="geometry">
+        <bufferAttribute
+          attach="attributes-position"
+          count={positions.length / 3}
+          array={positions}
+          itemSize={3}
+        />
+      </bufferGeometry>
       <pointsMaterial
+        attach="material"
         size={0.1}
         color="#10B981"
         transparent
