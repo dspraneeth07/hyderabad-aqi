@@ -1,115 +1,72 @@
-import { Link } from "react-router-dom";
-import { Instagram, Linkedin, Twitter, Mail, Phone, BookText } from "lucide-react";
+
+import { Mail, Phone, Instagram, Linkedin, Twitter, ExternalLink } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-r from-blue-900 to-blue-800 text-white">
-      <div className="container mx-auto px-4 py-12">
+    <footer className="bg-gray-900 text-white py-8">
+      <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Logo and Brand Section */}
-          <div className="col-span-1 md:col-span-1">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center animate-float">
-                <span className="text-blue-600 text-2xl font-bold">H</span>
-              </div>
-              <span className="text-xl font-bold text-primary-foreground">Hyderabad AQI</span>
+          {/* Company Info */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">EcoSphere</h3>
+            <p className="text-gray-400 text-sm">
+              Your complete AI-powered environmental platform for monitoring air quality, tracking carbon footprint, and making sustainable choices.
+            </p>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h4 className="font-semibold mb-4">Quick Links</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="/live-aqi" className="text-gray-400 hover:text-white">Live AQI Updates</a></li>
+              <li><a href="/aqi-insights" className="text-gray-400 hover:text-white">AQI Insights</a></li>
+              <li><a href="/carbon-tracker" className="text-gray-400 hover:text-white">Carbon Tracker</a></li>
+              <li><a href="/green-wallet" className="text-gray-400 hover:text-white">Green Wallet</a></li>
+              <li><a href="/plant-designer" className="text-gray-400 hover:text-white">Plant Designer</a></li>
+              <li><a href="/waste-scan" className="text-gray-400 hover:text-white">WasteScan AI</a></li>
+            </ul>
+          </div>
+
+          {/* Social Media */}
+          <div>
+            <h4 className="font-semibold mb-4">Follow Us</h4>
+            <div className="flex space-x-4">
+              <a href="https://instagram.com/praneethinspires" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                <Instagram className="w-5 h-5" />
+              </a>
+              <a href="https://linkedin.com/in/dspraneeth" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                <Linkedin className="w-5 h-5" />
+              </a>
+              <a href="https://x.com/DSPRANEETHREDDY" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                <Twitter className="w-5 h-5" />
+              </a>
+              <a href="https://www.researchgate.net/profile/Sai-Praneeth-Reddy-Dhadi" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                <ExternalLink className="w-5 h-5" />
+              </a>
+              <a href="https://medium.com/@spreddydhadi" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                <ExternalLink className="w-5 h-5" />
+              </a>
             </div>
           </div>
 
+          {/* Contact Info */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li><Link to="/" className="hover:text-primary transition-colors">Home</Link></li>
-              <li><Link to="/prediction" className="hover:text-primary transition-colors">Prediction Tool</Link></li>
-              <li><Link to="/about" className="hover:text-primary transition-colors">About Us</Link></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <Mail className="h-5 w-5" />
-                <span>dspraneeth07@gmail.com</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Phone className="h-5 w-5" />
-                <span>+91 7416466619</span>
-              </li>
-            </ul>
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Follow Us</h3>
-            <div className="flex flex-wrap gap-4">
-              <a 
-                href="https://instagram.com/praneethinspires" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="hover:text-primary transition-colors"
-                aria-label="Instagram"
-              >
-                <Instagram className="h-6 w-6" />
-              </a>
-              <a 
-                href="https://linkedin.com/in/dspraneeth" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="hover:text-primary transition-colors"
-                aria-label="LinkedIn"
-              >
-                <Linkedin className="h-6 w-6" />
-              </a>
-              <a 
-                href="https://twitter.com/DSPRANEETHREDDY" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="hover:text-primary transition-colors"
-                aria-label="Twitter"
-              >
-                <Twitter className="h-6 w-6" />
-              </a>
-              <a 
-                href="https://www.researchgate.net/profile/Sai-Praneeth-Reddy-Dhadi" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="hover:text-primary transition-colors"
-                aria-label="ResearchGate"
-              >
-                <BookText className="h-6 w-6" />
-              </a>
-              <a 
-                href="https://medium.com/@spreddydhadi" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="hover:text-primary transition-colors"
-                aria-label="Medium"
-              >
-                <svg 
-                  viewBox="0 0 24 24" 
-                  className="h-6 w-6 fill-current"
-                  aria-hidden="true"
-                >
-                  <path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zm7.42 0c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z"/>
-                </svg>
-              </a>
+            <h4 className="font-semibold mb-4">Contact Us</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-400">spreddydhadi@gmail.com</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-400">+91 9876543210</span>
+              </div>
             </div>
           </div>
         </div>
-        
-        <div className="mt-12 pt-8 border-t border-gray-800 text-center">
-          <p>© 2025 Xpeditionr. All Rights Reserved.</p>
-          <p className="mt-2 text-sm text-gray-400">
-            Designed and developed by{" "}
-            <a 
-              href="https://github.com/dspraneeth07" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
-              Dhadi Sai Praneeth Reddy
-            </a>
-          </p>
+
+        <div className="border-t border-gray-800 mt-8 pt-4 text-center text-gray-400 text-sm">
+          <p>&copy; 2024 EcoSphere. All rights reserved. Developed by Sai Praneeth Reddy Dhadi</p>
         </div>
       </div>
     </footer>
