@@ -1,7 +1,7 @@
 
 import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Text, Box, Sphere } from '@react-three/drei';
+import { Text, Box, Sphere, Line } from '@react-three/drei';
 import { Block } from '@/utils/blockchain';
 import * as THREE from 'three';
 
@@ -71,17 +71,11 @@ function ConnectionLine({ start, end }: { start: [number, number, number]; end: 
   }, [start, end]);
 
   return (
-    <line>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          array={new Float32Array(points.flatMap(p => [p.x, p.y, p.z]))}
-          count={points.length}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <lineBasicMaterial color="#4B5563" />
-    </line>
+    <Line
+      points={points}
+      color="#4B5563"
+      lineWidth={2}
+    />
   );
 }
 
