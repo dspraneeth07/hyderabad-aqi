@@ -1,56 +1,14 @@
 
-import { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
-
-function Particles({ count = 100 }) {
-  const mesh = useRef<THREE.Points>(null);
-  
-  // Create positions array for the buffer attribute
-  const positions = useMemo(() => {
-    const pos = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 20;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 20;
-    }
-    return pos;
-  }, [count]);
-
-  useFrame((state) => {
-    if (mesh.current) {
-      mesh.current.rotation.x = state.clock.getElapsedTime() * 0.05;
-      mesh.current.rotation.y = state.clock.getElapsedTime() * 0.03;
-    }
-  });
-
-  return (
-    <points ref={mesh}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={positions.length / 3}
-          array={positions}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.1}
-        color="#10B981"
-        transparent
-        opacity={0.6}
-        sizeAttenuation={false}
-      />
-    </points>
-  );
-}
+import React from 'react';
 
 export const ParticleBackground: React.FC<{ className?: string }> = ({ className }) => {
   return (
     <div className={`fixed inset-0 -z-10 ${className}`}>
-      <Canvas camera={{ position: [0, 0, 5] }}>
-        <Particles />
-      </Canvas>
+      <div className="absolute inset-0 bg-gradient-to-br from-green-50/20 to-emerald-100/20">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(16,185,129,0.1),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(16,185,129,0.08),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_20%,rgba(16,185,129,0.06),transparent_50%)]" />
+      </div>
     </div>
   );
 };
