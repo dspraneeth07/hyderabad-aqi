@@ -195,9 +195,9 @@ const PlantDesigner = () => {
                       <SelectValue placeholder="Select size" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="small">Small (&lt; 50 sq ft)</SelectItem>
+                      <SelectItem value="small">Small ({"<"} 50 sq ft)</SelectItem>
                       <SelectItem value="medium">Medium (50-200 sq ft)</SelectItem>
-                      <SelectItem value="large">Large (&gt; 200 sq ft)</SelectItem>
+                      <SelectItem value="large">Large ({">"} 200 sq ft)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -214,7 +214,7 @@ const PlantDesigner = () => {
                     <SelectContent>
                       <SelectItem value="full-sun">Full Sun (6+ hours)</SelectItem>
                       <SelectItem value="partial-sun">Partial Sun (3-6 hours)</SelectItem>
-                      <SelectItem value="shade">Shade (&lt; 3 hours)</SelectItem>
+                      <SelectItem value="shade">Shade ({"<"} 3 hours)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -226,9 +226,9 @@ const PlantDesigner = () => {
                       <SelectValue placeholder="Select time" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="minimal">Minimal (&lt; 30 min/week)</SelectItem>
+                      <SelectItem value="minimal">Minimal ({"<"} 30 min/week)</SelectItem>
                       <SelectItem value="moderate">Moderate (30-60 min/week)</SelectItem>
-                      <SelectItem value="extensive">Extensive (&gt; 60 min/week)</SelectItem>
+                      <SelectItem value="extensive">Extensive ({">"} 60 min/week)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
