@@ -6,14 +6,18 @@ import * as THREE from 'three';
 function Particles({ count = 100 }) {
   const mesh = useRef<THREE.Points>(null);
   
-  const particlesPosition = useMemo(() => {
+  const [positions, geometry] = useMemo(() => {
     const positions = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       positions[i * 3] = (Math.random() - 0.5) * 20;
       positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
       positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
     }
-    return positions;
+    
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    
+    return [positions, geometry];
   }, [count]);
 
   useFrame((state) => {
@@ -24,15 +28,7 @@ function Particles({ count = 100 }) {
   });
 
   return (
-    <points ref={mesh}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={count}
-          array={particlesPosition}
-          itemSize={3}
-        />
-      </bufferGeometry>
+    <points ref={mesh} geometry={geometry}>
       <pointsMaterial
         size={0.1}
         color="#10B981"
