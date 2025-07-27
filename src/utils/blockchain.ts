@@ -1,4 +1,3 @@
-
 import CryptoJS from 'crypto-js';
 import { ethers } from 'ethers';
 
@@ -32,11 +31,11 @@ export interface Block {
 
 export class EcoBlockchain {
   private chain: Block[] = [];
-  private difficulty: number = 4; // Increased difficulty for more realistic mining
+  private difficulty: number = 4;
   private pendingTransactions: Transaction[] = [];
   private miningReward: number = 50;
   private provider: ethers.JsonRpcProvider | null = null;
-  private signer: ethers.Wallet | null = null;
+  private signer: ethers.HDNodeWallet | null = null;
 
   constructor() {
     this.chain = [this.createGenesisBlock()];
@@ -45,12 +44,8 @@ export class EcoBlockchain {
 
   private async initializeEthers() {
     try {
-      // Initialize with a local provider or test network
       this.provider = new ethers.JsonRpcProvider('https://sepolia.infura.io/v3/demo');
-      
-      // Create a random wallet for demonstration
       this.signer = ethers.Wallet.createRandom();
-      
       console.log('Blockchain initialized with Ethers.js');
       console.log('Wallet address:', this.signer.address);
     } catch (error) {
@@ -134,7 +129,6 @@ export class EcoBlockchain {
       gasLimit: '21000'
     };
 
-    // Sign transaction if ethers is available
     if (this.signer) {
       try {
         const messageHash = ethers.keccak256(ethers.toUtf8Bytes(JSON.stringify(newTransaction)));
@@ -151,7 +145,6 @@ export class EcoBlockchain {
   async minePendingTransactions(miningRewardAddress: string): Promise<Block> {
     console.log('🚀 Starting mining process...');
     
-    // Create mining reward transaction
     const rewardTransaction: Transaction = {
       id: '0x' + CryptoJS.lib.WordArray.random(32).toString(),
       from: '0x0000000000000000000000000000000000000000',
@@ -181,7 +174,6 @@ export class EcoBlockchain {
       gasLimit: 8000000
     };
 
-    // Proof of Work mining
     console.log('⛏️  Mining block with difficulty:', this.difficulty);
     const startTime = Date.now();
     
@@ -205,7 +197,6 @@ export class EcoBlockchain {
       block.nonce++;
       hash = this.calculateBlockHash(block);
       
-      // Add a small delay to prevent UI blocking
       if (block.nonce % 1000 === 0) {
         await new Promise(resolve => setTimeout(resolve, 1));
       }
@@ -255,7 +246,6 @@ export class EcoBlockchain {
         return false;
       }
 
-      // Verify proof of work
       const target = '0x' + Array(currentBlock.difficulty + 1).join('0');
       if (!currentBlock.hash.startsWith(target)) {
         return false;
@@ -284,7 +274,6 @@ export class EcoBlockchain {
   }
 
   private calculateNetworkHashRate(): number {
-    // Simplified hash rate calculation
     const recentBlocks = this.chain.slice(-10);
     if (recentBlocks.length < 2) return 0;
     
@@ -305,12 +294,10 @@ export class EcoBlockchain {
     return timeDiffs.reduce((sum, diff) => sum + diff, 0) / timeDiffs.length;
   }
 
-  // Get wallet address if ethers is initialized
   getWalletAddress(): string {
     return this.signer?.address || '0x742d35Cc6634C0532925a3b8D6aBC4c2b5C7FDec';
   }
 
-  // Get provider status
   getProviderStatus(): { connected: boolean; network?: string } {
     return {
       connected: this.provider !== null,
@@ -319,5 +306,4 @@ export class EcoBlockchain {
   }
 }
 
-// Create a singleton instance
 export const ecoBlockchain = new EcoBlockchain();

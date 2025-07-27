@@ -1,5 +1,5 @@
 
-import { useRef, useMemo } from 'react';
+import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Text, Box, Sphere } from '@react-three/drei';
 import { Block } from '@/utils/blockchain';
@@ -65,32 +65,8 @@ function BlockMesh({ block, position, isLatest }: { block: Block; position: [num
   );
 }
 
-function ConnectionLine({ start, end }: { start: [number, number, number]; end: [number, number, number] }) {
-  const points = useMemo(() => {
-    const startVec = new THREE.Vector3(...start);
-    const endVec = new THREE.Vector3(...end);
-    return [startVec.x, startVec.y, startVec.z, endVec.x, endVec.y, endVec.z];
-  }, [start, end]);
-
-  return (
-    <line>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          array={new Float32Array(points)}
-          count={2}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <lineBasicMaterial color="#4B5563" />
-    </line>
-  );
-}
-
 export const BlockchainVisualizer: React.FC<BlockchainVisualizerProps> = ({ blocks, className }) => {
-  const blockPositions = useMemo(() => {
-    return blocks.map((_, index) => [index * 3 - (blocks.length - 1) * 1.5, 0, 0] as [number, number, number]);
-  }, [blocks]);
+  const blockPositions = blocks.map((_, index) => [index * 3 - (blocks.length - 1) * 1.5, 0, 0] as [number, number, number]);
 
   return (
     <div className={`h-64 w-full ${className}`}>
@@ -105,14 +81,6 @@ export const BlockchainVisualizer: React.FC<BlockchainVisualizerProps> = ({ bloc
             block={block}
             position={blockPositions[index]}
             isLatest={index === blocks.length - 1}
-          />
-        ))}
-        
-        {blockPositions.slice(0, -1).map((pos, index) => (
-          <ConnectionLine
-            key={index}
-            start={[pos[0] + 0.5, pos[1], pos[2]]}
-            end={[blockPositions[index + 1][0] - 0.5, blockPositions[index + 1][1], blockPositions[index + 1][2]]}
           />
         ))}
       </Canvas>
