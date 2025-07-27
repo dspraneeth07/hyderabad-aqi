@@ -1,7 +1,7 @@
 
 import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Text, Box, Sphere, Line } from '@react-three/drei';
+import { Text, Box, Sphere } from '@react-three/drei';
 import { Block } from '@/utils/blockchain';
 import * as THREE from 'three';
 
@@ -67,15 +67,23 @@ function BlockMesh({ block, position, isLatest }: { block: Block; position: [num
 
 function ConnectionLine({ start, end }: { start: [number, number, number]; end: [number, number, number] }) {
   const points = useMemo(() => {
-    return [new THREE.Vector3(...start), new THREE.Vector3(...end)];
+    const startVec = new THREE.Vector3(...start);
+    const endVec = new THREE.Vector3(...end);
+    return [startVec.x, startVec.y, startVec.z, endVec.x, endVec.y, endVec.z];
   }, [start, end]);
 
   return (
-    <Line
-      points={points}
-      color="#4B5563"
-      lineWidth={2}
-    />
+    <line>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          array={new Float32Array(points)}
+          count={2}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <lineBasicMaterial color="#4B5563" />
+    </line>
   );
 }
 
