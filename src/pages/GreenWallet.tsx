@@ -1,18 +1,18 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Wallet, Award, Users, TreePine, Recycle, Car, Zap, Gift, Blocks, Shield, TrendingUp } from "lucide-react";
+import { Wallet, Award, Users, TreePine, Recycle, Car, Zap, Gift, Blocks, Shield, TrendingUp, Network } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { BlockchainVisualizer } from "@/components/BlockchainVisualizer";
 import { ParticleBackground } from "@/components/ParticleBackground";
+import { LoadingAnimation } from "@/components/LoadingAnimation";
 import { ecoBlockchain, Transaction, Block } from "@/utils/blockchain";
 
 const GreenWallet = () => {
-  const [userAddress] = useState("0x742d35Cc6634C0532925a3b8D6aBC4c2b5C7FDec");
+  const [userAddress, setUserAddress] = useState("");
   const [ecoPoints, setEcoPoints] = useState(0);
   const [userLevel, setUserLevel] = useState("Eco Warrior");
   const [weeklyGoal] = useState(200);
@@ -20,13 +20,16 @@ const GreenWallet = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("");
+  const [loadingType, setLoadingType] = useState<'thinking' | 'processing' | 'analyzing' | 'mining'>('thinking');
   const [blockchainInfo, setBlockchainInfo] = useState<any>(null);
+  const [networkStatus, setNetworkStatus] = useState<any>(null);
 
   const [leaderboard] = useState([
     { rank: 1, name: "EcoHero2024", points: 2450, level: "Planet Protector", address: "0x123...abc" },
     { rank: 2, name: "GreenGuardian", points: 2100, level: "Eco Champion", address: "0x456...def" },
     { rank: 3, name: "NatureNinja", points: 1890, level: "Eco Warrior", address: "0x789...ghi" },
-    { rank: 4, name: "You", points: ecoPoints, level: userLevel, address: userAddress },
+    { rank: 4, name: "You", points: ecoPoints, level: userLevel, address: userAddress.slice(0, 6) + "..." + userAddress.slice(-4) },
     { rank: 5, name: "TreeHugger", points: 1100, level: "Green Enthusiast", address: "0x321...jkl" }
   ]);
 
@@ -47,28 +50,45 @@ const GreenWallet = () => {
   ];
 
   useEffect(() => {
-    // Initialize blockchain data
-    const initializeBlockchain = () => {
-      const balance = ecoBlockchain.getBalance(userAddress);
-      const allTransactions = ecoBlockchain.getAllTransactions();
-      const info = ecoBlockchain.getBlockchainInfo();
+    const initializeBlockchain = async () => {
+      setIsLoading(true);
+      setLoadingMessage("Initializing blockchain...");
+      setLoadingType('thinking');
       
-      setEcoPoints(balance);
-      setTransactions(allTransactions.slice(-10)); // Show last 10 transactions
-      setBlocks(info.isValid ? ecoBlockchain['chain'] : []);
-      setBlockchainInfo(info);
-      setCurrentWeekPoints(balance % 200); // Mock weekly progress
+      try {
+        const walletAddress = ecoBlockchain.getWalletAddress();
+        const balance = ecoBlockchain.getBalance(walletAddress);
+        const allTransactions = ecoBlockchain.getAllTransactions();
+        const info = ecoBlockchain.getBlockchainInfo();
+        const status = ecoBlockchain.getProviderStatus();
+        
+        setUserAddress(walletAddress);
+        setEcoPoints(balance);
+        setTransactions(allTransactions.slice(-10));
+        setBlocks(info.isValid ? ecoBlockchain['chain'] : []);
+        setBlockchainInfo(info);
+        setNetworkStatus(status);
+        setCurrentWeekPoints(balance % 200);
+        
+        console.log('Blockchain initialized:', info);
+        console.log('Network status:', status);
+      } catch (error) {
+        console.error('Blockchain initialization failed:', error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     initializeBlockchain();
-  }, [userAddress]);
+  }, []);
 
   const handleSubmitAction = async (action: any) => {
     setIsLoading(true);
+    setLoadingMessage(`Processing ${action.type}...`);
+    setLoadingType('processing');
     
     try {
-      // Create a new transaction on the blockchain
-      const transaction = ecoBlockchain.createTransaction({
+      const transaction = await ecoBlockchain.createTransaction({
         from: 'system',
         to: userAddress,
         amount: action.points,
@@ -76,10 +96,14 @@ const GreenWallet = () => {
         action: action.type
       });
 
-      // Mine the pending transactions
-      const newBlock = ecoBlockchain.minePendingTransactions(userAddress);
+      setLoadingMessage("Mining new block...");
+      setLoadingType('mining');
       
-      // Update local state
+      const newBlock = await ecoBlockchain.minePendingTransactions(userAddress);
+      
+      setLoadingMessage("Updating blockchain state...");
+      setLoadingType('analyzing');
+      
       const newBalance = ecoBlockchain.getBalance(userAddress);
       const allTransactions = ecoBlockchain.getAllTransactions();
       const info = ecoBlockchain.getBlockchainInfo();
@@ -90,11 +114,11 @@ const GreenWallet = () => {
       setBlockchainInfo(info);
       setCurrentWeekPoints(prev => prev + action.points);
       
-      console.log('Transaction completed:', transaction);
-      console.log('New block mined:', newBlock);
+      console.log('✅ Transaction completed:', transaction);
+      console.log('✅ New block mined:', newBlock);
       
     } catch (error) {
-      console.error('Transaction failed:', error);
+      console.error('❌ Transaction failed:', error);
     } finally {
       setIsLoading(false);
     }
@@ -104,10 +128,11 @@ const GreenWallet = () => {
     if (ecoPoints < reward.cost) return;
     
     setIsLoading(true);
+    setLoadingMessage(`Redeeming ${reward.name}...`);
+    setLoadingType('processing');
     
     try {
-      // Create a spending transaction
-      const transaction = ecoBlockchain.createTransaction({
+      const transaction = await ecoBlockchain.createTransaction({
         from: userAddress,
         to: 'rewards-system',
         amount: reward.cost,
@@ -115,10 +140,11 @@ const GreenWallet = () => {
         action: `Redeemed: ${reward.name}`
       });
 
-      // Mine the pending transactions
-      const newBlock = ecoBlockchain.minePendingTransactions(userAddress);
+      setLoadingMessage("Mining redemption block...");
+      setLoadingType('mining');
       
-      // Update local state
+      const newBlock = await ecoBlockchain.minePendingTransactions(userAddress);
+      
       const newBalance = ecoBlockchain.getBalance(userAddress);
       const allTransactions = ecoBlockchain.getAllTransactions();
       const info = ecoBlockchain.getBlockchainInfo();
@@ -128,17 +154,34 @@ const GreenWallet = () => {
       setBlocks(info.isValid ? ecoBlockchain['chain'] : []);
       setBlockchainInfo(info);
       
-      console.log('Reward redeemed:', transaction);
-      console.log('New block mined:', newBlock);
+      console.log('✅ Reward redeemed:', transaction);
+      console.log('✅ New block mined:', newBlock);
       
     } catch (error) {
-      console.error('Redemption failed:', error);
+      console.error('❌ Redemption failed:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const progressPercentage = Math.min((currentWeekPoints / weeklyGoal) * 100, 100);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col relative overflow-hidden">
+        <ParticleBackground />
+        <Header />
+        <main className="flex-grow pt-20 relative z-10 flex items-center justify-center">
+          <LoadingAnimation 
+            message={loadingMessage}
+            type={loadingType}
+            className="text-white"
+          />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
@@ -153,8 +196,19 @@ const GreenWallet = () => {
                 EcoChain Wallet
               </h1>
               <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-                Earn, verify, and redeem EcoPoints on a real blockchain ecosystem for climate-positive actions
+                Real blockchain ecosystem powered by Ethers.js for climate-positive actions
               </p>
+              {networkStatus && (
+                <div className="mt-4 flex items-center justify-center gap-2">
+                  <Network className="w-4 h-4 text-green-400" />
+                  <span className="text-sm text-gray-400">
+                    Connected to: {networkStatus.network}
+                  </span>
+                  <Badge variant="outline" className="text-green-400 border-green-400">
+                    {networkStatus.connected ? 'Online' : 'Offline'}
+                  </Badge>
+                </div>
+              )}
             </div>
 
             {/* Blockchain Visualizer */}
@@ -166,7 +220,7 @@ const GreenWallet = () => {
                 </h3>
                 <BlockchainVisualizer blocks={blocks} className="rounded-lg bg-gray-800/30" />
                 {blockchainInfo && (
-                  <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div className="mt-4 grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-blue-400">{blockchainInfo.totalBlocks}</div>
                       <div className="text-gray-400">Total Blocks</div>
@@ -178,6 +232,10 @@ const GreenWallet = () => {
                     <div className="text-center">
                       <div className="text-2xl font-bold text-purple-400">{blockchainInfo.difficulty}</div>
                       <div className="text-gray-400">Difficulty</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-orange-400">{blockchainInfo.totalSupply}</div>
+                      <div className="text-gray-400">Total Supply</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-yellow-400">
@@ -221,14 +279,13 @@ const GreenWallet = () => {
                   <div className="text-2xl font-semibold mb-2">{blocks.length}</div>
                   <div className="text-sm opacity-90">Blocks Mined</div>
                   <div className="text-xs opacity-75 mt-1">
-                    Chain Status: {blockchainInfo?.isValid ? 'Valid' : 'Invalid'}
+                    Hash Rate: {blockchainInfo?.networkHashRate?.toFixed(0) || 0} H/s
                   </div>
                 </div>
               </div>
             </Card>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Eco Actions */}
               <div className="lg:col-span-2">
                 <Card className="p-6 mb-6 bg-gray-900/50 border-gray-700 backdrop-blur-sm">
                   <h3 className="text-2xl font-semibold mb-6 text-white">Earn EcoPoints</h3>
@@ -257,7 +314,6 @@ const GreenWallet = () => {
                   </div>
                 </Card>
 
-                {/* Transaction History */}
                 <Card className="p-6 bg-gray-900/50 border-gray-700 backdrop-blur-sm">
                   <h3 className="text-2xl font-semibold mb-6 text-white">Blockchain Transactions</h3>
                   <div className="space-y-4">
@@ -274,8 +330,13 @@ const GreenWallet = () => {
                               {new Date(transaction.timestamp).toLocaleString()}
                             </div>
                             <div className="text-xs text-gray-500 font-mono mt-1">
-                              Hash: {transaction.hash.slice(0, 16)}...
+                              TX: {transaction.hash.slice(0, 20)}...
                             </div>
+                            {transaction.signature && (
+                              <div className="text-xs text-gray-600 mt-1">
+                                ✅ Cryptographically Signed
+                              </div>
+                            )}
                           </div>
                           <div className="text-right">
                             <div className={`font-semibold ${transaction.type === 'EARN' ? 'text-green-400' : 'text-red-400'}`}>
@@ -292,9 +353,7 @@ const GreenWallet = () => {
                 </Card>
               </div>
 
-              {/* Sidebar */}
               <div className="space-y-6">
-                {/* Leaderboard */}
                 <Card className="p-6 bg-gray-900/50 border-gray-700 backdrop-blur-sm">
                   <h3 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">
                     <Users className="w-5 h-5" />
@@ -311,7 +370,7 @@ const GreenWallet = () => {
                             <div className="font-medium text-white">{user.name}</div>
                             <div className="text-xs text-gray-400">{user.level}</div>
                             <div className="text-xs text-gray-500 font-mono">
-                              {user.address.slice(0, 6)}...{user.address.slice(-4)}
+                              {user.address}
                             </div>
                           </div>
                         </div>
@@ -321,7 +380,6 @@ const GreenWallet = () => {
                   </div>
                 </Card>
 
-                {/* Rewards Store */}
                 <Card className="p-6 bg-gray-900/50 border-gray-700 backdrop-blur-sm">
                   <h3 className="text-xl font-semibold mb-4 text-white">Rewards Store</h3>
                   <div className="space-y-4">
